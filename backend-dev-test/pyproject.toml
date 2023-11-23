@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "backend-dev-test"
+name = "backend"
 version = "0.1.0"
 description = ""
 authors = ["Andres Rengifo <amrengifoh@gmail.com>"]
@@ -7,6 +7,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+django = "^4.2.7"
+selenium = "^4.15.2"
 
 
 [build-system]

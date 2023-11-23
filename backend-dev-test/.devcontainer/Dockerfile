@@ -6,6 +6,13 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     wget \
+    bzip2 \
+    libxtst6 \
+    libgtk-3-0 \
+    libx11-xcb-dev \
+    libdbus-glib-1-2 \
+    libxt6 \
+    libpci-dev \
     zip \
     unzip \
     tar \
@@ -26,5 +33,6 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     && rm -rf /var/lib/apt/lists/*
 
+# Install poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="/root/.local/bin:$PATH"

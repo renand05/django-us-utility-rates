@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     libdbus-glib-1-2 \
     libxt6 \
     libpci-dev \
+    firefox-esr \
+    xvfb \
     zip \
     unzip \
     tar \
@@ -36,3 +38,7 @@ RUN apt-get update && apt-get install -y \
 # Install poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="/root/.local/bin:$PATH"
+
+# Set environment variables for Xvfb
+ENV DISPLAY=:99
+ENV SCREEN=0

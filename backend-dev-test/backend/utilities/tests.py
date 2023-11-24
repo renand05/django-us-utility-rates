@@ -28,7 +28,6 @@ class WebsiteDemoTest(TestCase):
         request.POST['user_percentage_scale'] = '10'
         response = website_demo(request)
         self.assertIn('user_form', response.content.decode())
-        print(response.content.decode())
         expected_html = render_to_string(
             'website_demo.html',
             {'new_user_address': 'Black Star #45',
@@ -37,7 +36,6 @@ class WebsiteDemoTest(TestCase):
             },
             request=request
         )
-        print(expected_html)
         self.assertEqual(response.content.decode(), expected_html)
  
 class UserModelTest(TestCase):

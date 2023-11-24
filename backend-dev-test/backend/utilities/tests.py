@@ -4,8 +4,8 @@ from django.http import HttpRequest
 from django.template.loader import render_to_string
 from unittest import mock
 
-from lists.views import home_page
-from lists.models import Item
+from utilities.views import home_page
+from utilities.models import User
 
 @mock.patch('django.template.context_processors.get_token', mock.Mock(return_value='predicabletoken'))
 class HomePageTest(TestCase):
@@ -35,15 +35,17 @@ class HomePageTest(TestCase):
  
 class ItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self):
-        first_item = Item()
-        first_item.text = 'The first (ever) list item'
-        first_item.save()
-        second_item = Item()
-        second_item.text = 'Item the second'
-        second_item.save()
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
-        first_saved_item = saved_items[0]
-        second_saved_item = saved_items[1]
-        self.assertEqual(first_saved_item.text, 'The first (ever) list item')
-        self.assertEqual(second_saved_item.text, 'Item the second')
+        first_user = User()
+        first_user.firstname = 'Luke'
+        first_user.lastname = 'Skywalker'
+        first_user.save()
+        second_user = User()
+        second_user.firstname = 'Han'
+        second_user.lastname = 'Solo'
+        second_user.save()
+        saved_users = User.objects.all()
+        self.assertEqual(saved_users.count(), 2)
+        first_saved_user = saved_users[0]
+        second_saved_user = saved_users[1]
+        self.assertEqual(first_saved_user.firstname, 'Luke')
+        self.assertEqual(second_saved_user.firstname, 'Han')

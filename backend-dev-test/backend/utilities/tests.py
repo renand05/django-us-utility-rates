@@ -7,26 +7,38 @@ from unittest import mock
 from utilities.views import website_demo
 from utilities.models import User
 
+from pydantic import BaseModel
+
+class WebsiteDemoRequest(BaseModel):
+    user_address: str
+    user_consumption: str
+    user_percentage_scale: str
+
 @mock.patch('django.template.context_processors.get_token', mock.Mock(return_value='predicabletoken'))
 class WebsiteDemoTest(TestCase):
-    def test_root_url_resolves_to_website_view(self):
+    def build_post_website_demo_body(self) -> WebsiteDemoRequest:
+        return WebsiteDemoRequest(
+            user_address='Black Star #45',
+            user_consumption='15',
+            user_percentage_scale='10'
+        )
+
+    def test_root_url_resolves_to_website_view(self) -> None:
         found = resolve('/')
         self.assertEqual(found.func, website_demo)
     
-    def test_website_has_correct_html_title(self):
+    def test_website_has_correct_html_title(self) -> None:
         request = HttpRequest()
-        response = website_demo(request)
+        response = website_demo(request=request)
         self.assertTrue(response.content.startswith(b'<html>'))
         self.assertIn(b'<title>Aether Energy Utilities Demo</title>', response.content)
         self.assertTrue(response.content.strip().endswith(b'</html>'))
     
-    def test_website_can_save_a_POST_request(self):
+    def test_website_can_save_a_POST_request(self) -> None:
         request = HttpRequest()
         request.method = 'POST'
-        request.POST['user_address'] = 'Black Star #45'
-        request.POST['user_consumption'] = '15'
-        request.POST['user_percentage_scale'] = '10'
-        response = website_demo(request)
+        request.POST = self.build_post_website_demo_body().model_dump()
+        response = website_demo(request=request)
         self.assertIn('user_form', response.content.decode())
         expected_html = render_to_string(
             'website_demo.html',
@@ -39,7 +51,7 @@ class WebsiteDemoTest(TestCase):
         self.assertEqual(response.content.decode(), expected_html)
  
 class UserModelTest(TestCase):
-    def test_saving_and_retrieving_items(self):
+    def test_saving_and_retrieving_items(self) -> None:
         first_user = User()
         first_user.firstname = 'Luke'
         first_user.lastname = 'Skywalker'

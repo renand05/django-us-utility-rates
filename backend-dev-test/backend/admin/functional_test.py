@@ -6,15 +6,15 @@ import time
 
 class NewVisitorTest(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         opts = webdriver.FirefoxOptions()
         opts.add_argument('--headless')
         self.browser = webdriver.Firefox(options=opts)
     
-    def tearDown(self):
+    def tearDown(self) -> None:
         self.browser.quit()
 
-    def test_can_start_a_list_and_retrieve_it_later(self):
+    def test_can_start_a_list_and_retrieve_it_later(self) -> None:
         self.browser.get('http://localhost:8000')
 
         self.assertIn('Aether Energy Utilities Demo', self.browser.title)

@@ -18,5 +18,5 @@ from django.urls import path
 from utilities import views
 
 urlpatterns = [
-    path('', views.website_demo, name='website_demo'),
+    path('', views.WebsiteDemoView.as_view(template_name="website_demo.html")),
 ]

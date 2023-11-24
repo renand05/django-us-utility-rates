@@ -18,13 +18,13 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.get('http://localhost:8000')
 
         self.assertIn('Aether Energy Utilities Demo', self.browser.title)
-        header_element = self.browser.find_element(By.TAG_NAME, 'h1')
+        header_element = self.browser.find_element(by=By.TAG_NAME, value='h1')
         self.assertIn('User Utility Form', header_element.text)
 
-        user_address_box = self.browser.find_element(By.ID, 'new_user_address')
-        user_consumption_box = self.browser.find_element(By.ID, 'new_user_consumption')
-        user_percentage_box = self.browser.find_element(By.ID, 'new_user_percentage')
-        submit_button = self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
+        user_address_box = self.browser.find_element(by=By.ID, value='new_user_address')
+        user_consumption_box = self.browser.find_element(by=By.ID, value='new_user_consumption')
+        user_percentage_box = self.browser.find_element(by=By.ID, value='new_user_percentage')
+        submit_button = self.browser.find_element(by=By.CSS_SELECTOR, value='button[type="submit"]')
 
         self.assertEqual(
             user_address_box.get_attribute('placeholder'),
@@ -44,7 +44,7 @@ class NewVisitorTest(unittest.TestCase):
         submit_button.click()
         time.sleep(5)
 
-        rows = self.browser.find_elements(By.TAG_NAME, 'tr')
+        rows = self.browser.find_elements(by=By.TAG_NAME, value='tr')
         self.assertIn('Address: Black Star #45 Consumption: 15 Percentage: 10', [row.text for row in rows])
         self.fail('Finish the test!')
 

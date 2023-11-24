@@ -4,36 +4,43 @@ from django.http import HttpRequest
 from django.template.loader import render_to_string
 from unittest import mock
 
-from utilities.views import home_page
+from utilities.views import website_demo
 from utilities.models import User
 
 @mock.patch('django.template.context_processors.get_token', mock.Mock(return_value='predicabletoken'))
-class HomePageTest(TestCase):
-    def test_root_url_resolves_to_home_page_view(self):
+class WebsiteDemoTest(TestCase):
+    def test_root_url_resolves_to_website_view(self):
         found = resolve('/')
-        self.assertEqual(found.func, home_page)
+        self.assertEqual(found.func, website_demo)
     
-    def test_home_page_has_correct_html_title(self):
+    def test_website_has_correct_html_title(self):
         request = HttpRequest()
-        response = home_page(request)
+        response = website_demo(request)
         self.assertTrue(response.content.startswith(b'<html>'))
-        self.assertIn(b'<title>To-Do lists</title>', response.content)
+        self.assertIn(b'<title>Aether Energy Utilities Demo</title>', response.content)
         self.assertTrue(response.content.strip().endswith(b'</html>'))
     
-    def test_home_page_can_save_a_POST_request(self):
+    def test_website_can_save_a_POST_request(self):
         request = HttpRequest()
         request.method = 'POST'
-        request.POST['item_text'] = 'A new list item'
-        response = home_page(request)
-        self.assertIn('A new list item', response.content.decode())
+        request.POST['user_address'] = 'Black Star #45'
+        request.POST['user_consumption'] = '15'
+        request.POST['user_percentage_scale'] = '10'
+        response = website_demo(request)
+        self.assertIn('user_form', response.content.decode())
+        print(response.content.decode())
         expected_html = render_to_string(
-            'home.html',
-            {'new_item_text': 'A new list item'},
+            'website_demo.html',
+            {'new_user_address': 'Black Star #45',
+             'new_user_consumption': '15',
+             'new_user_percentage_scale': '10'
+            },
             request=request
         )
+        print(expected_html)
         self.assertEqual(response.content.decode(), expected_html)
  
-class ItemModelTest(TestCase):
+class UserModelTest(TestCase):
     def test_saving_and_retrieving_items(self):
         first_user = User()
         first_user.firstname = 'Luke'

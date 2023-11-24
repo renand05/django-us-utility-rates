@@ -1,6 +1,8 @@
 from django.shortcuts import render
 
-def home_page(request):
-    return render(request, 'home.html', {
-        'new_item_text': request.POST.get('item_text', ''),
+def website_demo(request):
+    return render(request, 'website_demo.html', {
+        'new_user_address': request.POST.get('user_address', ''),
+        'new_user_consumption': request.POST.get('user_consumption', ''),
+        'new_user_percentage_scale': request.POST.get('user_percentage_scale', ''),
     })

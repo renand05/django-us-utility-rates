@@ -15,31 +15,37 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.quit()
 
     def test_can_start_a_list_and_retrieve_it_later(self):
-        # Edith has heard about a cool new online to-do app. She goes
-        # to check out its homepage
         self.browser.get('http://localhost:8000')
-        # She notices the page title and header mention to-do lists
-        self.assertIn('To-Do', self.browser.title)
+
+        self.assertIn('Aether Energy Utilities Demo', self.browser.title)
         header_element = self.browser.find_element(By.TAG_NAME, 'h1')
-        self.assertIn('Your To-Do list', header_element.text)
-        # She is invited to enter a to-do item straight away
-        inputbox = self.browser.find_element(By.ID, 'id_new_item')
+        self.assertIn('User Utility Form', header_element.text)
+
+        user_address_box = self.browser.find_element(By.ID, 'new_user_address')
+        user_consumption_box = self.browser.find_element(By.ID, 'new_user_consumption')
+        user_percentage_box = self.browser.find_element(By.ID, 'new_user_percentage')
+        submit_button = self.browser.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
+
         self.assertEqual(
-            inputbox.get_attribute('placeholder'),
-            'Enter a to-do item'
+            user_address_box.get_attribute('placeholder'),
+            'Enter Address'
         )
-        # She types "Buy peacock feathers" into a text box (Edith's hobby
-        # is tying fly-fishing lures)
-        inputbox.send_keys('Buy peacock feathers')
-        # When she hits enter, the page updates, and now the page lists
-        # "1: Buy peacock feathers" as an item in a to-do list table
-        inputbox.send_keys(Keys.ENTER)
+        self.assertEqual(
+            user_consumption_box.get_attribute('placeholder'),
+            'Enter consumption (kWh)'
+        )
+        self.assertEqual(
+            user_percentage_box.get_attribute('placeholder'),
+            'Enter percentage scale (%)'
+        )
+        user_address_box.send_keys('Black Star #45')
+        user_consumption_box.send_keys('15')
+        user_percentage_box.send_keys('10')
+        submit_button.click()
         time.sleep(5)
+
         rows = self.browser.find_elements(By.TAG_NAME, 'tr')
-        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
-        # There is still a text box inviting her to add another item. She
-        # enters "Use peacock feathers to make a fly" (Edith is very
-        # methodical)
+        self.assertIn('Address: Black Star #45 Consumption: 15 Percentage: 10', [row.text for row in rows])
         self.fail('Finish the test!')
 
 if __name__ == '__main__':

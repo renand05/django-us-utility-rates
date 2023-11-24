@@ -1,0 +1,22 @@
+<html>
+    <head>
+        <title>Aether Energy Utilities Demo</title>
+    </head>
+    <body>
+        <h1 id="user_form">User Utility Form</h1>
+            <form method="POST">
+                <input name="user_address" id="new_user_address" placeholder="Enter Address"/>
+                <input name="user_consumption" id="new_user_consumption" placeholder="Enter consumption (kWh)"/>
+                <input name="user_percentage_scale" id="new_user_percentage" placeholder="Enter percentage scale (%)"/>
+                {% csrf_token %}
+                <button type="submit" id="submit_button">Accept</button>
+            </form>
+            <table id="id_list_table">
+                <tr>
+                    <td>Address: {{ new_user_address }}</td>
+                    <td>Consumption: {{ new_user_consumption }}</td>
+                    <td>Percentage: {{ new_user_percentage_scale }}</td>
+                </tr>
+            </table>
+    </body>
+</html>

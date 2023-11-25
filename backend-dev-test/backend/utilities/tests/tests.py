@@ -1,4 +1,3 @@
-from django.urls import resolve
 from django.test import TestCase
 from django.http import HttpRequest, QueryDict
 from django.template.loader import render_to_string
@@ -49,18 +48,28 @@ class WebsiteDemoTest(TestCase):
         self.assertEqual(response.content.decode(), expected_html)
  
 class UserModelTest(TestCase):
-    def test_saving_and_retrieving_items(self) -> None:
+    def test_saving_and_retrieving_users(self) -> None:
         first_user = User()
         first_user.firstname = 'Luke'
         first_user.lastname = 'Skywalker'
+        first_user.address = 'Death Star #44'
+        first_user.email = 'luke@star.com'
+        first_user.national_id = '122star'
+        first_user.national_id_type = 'PS'
+        first_user.country = 'Tatoo'
         first_user.save()
         second_user = User()
         second_user.firstname = 'Han'
         second_user.lastname = 'Solo'
+        second_user.address = 'Falcon #44'
+        second_user.email = 'han@star.com'
+        second_user.national_id = '320star'
+        second_user.national_id_type = 'SS'
+        second_user.country = 'Tatoo'
         second_user.save()
         saved_users = User.objects.all()
-        self.assertEqual(saved_users.count(), 2)
-        first_saved_user = saved_users[0]
-        second_saved_user = saved_users[1]
+        self.assertEqual(saved_users.count(), 1)
+        first_saved_user = saved_users[-1]
+        second_saved_user = saved_users[0]
         self.assertEqual(first_saved_user.firstname, 'Luke')
         self.assertEqual(second_saved_user.firstname, 'Han')

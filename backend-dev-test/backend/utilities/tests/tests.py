@@ -1,10 +1,11 @@
-from django.test import TestCase
-from django.http import HttpRequest, QueryDict
-from django.template.loader import render_to_string
+from django.test import TestCase, override_settings
 from unittest.mock import patch
 from unittest import mock
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+from rest_framework.test import APIClient
+from rest_framework import status
 
-from utilities.views import WebsiteDemoView
 from utilities.models import User
 from utilities.services import UtilityRatesService, FakeUtilityRatesService
 
@@ -15,40 +16,31 @@ class WebsiteDemoRequest(BaseModel):
     user_consumption: str
     user_percentage_scale: str
 
-@mock.patch('django.template.context_processors.get_token', mock.Mock(return_value='predicabletoken'))
 class WebsiteDemoTest(TestCase):
-    def build_post_website_demo_body(self) -> QueryDict:
-        test_string = 'user_address=Black Star #45&user_consumption=15&user_percentage_scale=10'
-        demo_body_dict = QueryDict(test_string)
-        return demo_body_dict
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = get_user_model().objects.create_user(username='testuser', password='testpassword')
 
-    def test_website_has_correct_html_title(self) -> None:
-        view = WebsiteDemoView()
-        request = HttpRequest()
-        fake_service = FakeUtilityRatesService()
-        request.method = 'POST'
-        request.POST = self.build_post_website_demo_body()
-        response = view.post(request=request, service=fake_service)
-        self.assertTrue(response.content.startswith(b'<html>'))
-        self.assertIn(b'<title>Aether Energy Utilities Demo</title>', response.content)
-        self.assertTrue(response.content.strip().endswith(b'</html>'))
-    
-    def test_should_execute_a_POST_request(self) -> None:
-        view = WebsiteDemoView()
-        request = HttpRequest()
-        fake_service = FakeUtilityRatesService()
-        request.method = 'POST'
-        request.POST = self.build_post_website_demo_body()
-        response = view.post(request=request, service=fake_service)
-        self.assertIn('user_form', response.content.decode())
-        expected_html = render_to_string(
-            'website_demo.html',
-            {'new_user_address': 'Black Star #45',
-             'new_user_consumption': '15',
-             'new_user_percentage_scale': '10'},
-            request=request
+    @override_settings(
+        REST_FRAMEWORK={
+            'DEFAULT_AUTHENTICATION_CLASSES': [
+                'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+            ],
+        }
+    )
+
+    def test_jwt_authenticated_endpoint(self):
+        client = APIClient()
+        response = client.post(
+            reverse('token_obtain_pair'),
+            {'username': 'testuser', 'password': 'testpassword'},
+            format='json'
         )
-        self.assertEqual(response.content.decode(), expected_html)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        token = response.data['access']
+        client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+        response = client.get(reverse('rates_demo'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
  
 class ModelsTest(TestCase):
     def test_should_save_and_retrieve_users(self) -> None:

@@ -38,6 +38,7 @@ class OpenEiProcessor(ResponseProcessor):
         return [UtilityItem.model_validate(item) for item in items_list]
 
     def process_response(self, openei_response: Dict) -> List[UtilityItem]:
+        print('>>>>>>>>>>>>>>>>>> response', openei_response)
         utility_rates = self.parse_openei_response(openei_response=openei_response)
         # TODO compute avg cost
         # TODO get the most common utility tariff

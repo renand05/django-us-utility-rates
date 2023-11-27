@@ -1,6 +1,6 @@
 from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
-from django.urls import reverse
+
 from pydantic import BaseModel
 from rest_framework import test, status
 from unittest.mock import Mock, patch
@@ -37,3 +37,40 @@ class RegistrationApiTest(TestCase):
         for_user.assert_called_once()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
  
+    def test_should_retrieve_token(self) -> None:
+        client = test.APIClient()
+        response = client.post(
+            '/token',
+            {'username': 'testuser', 'password': 'testpassword'},
+            format='json'
+        )
+        self.assertIn('refresh', response.data.keys())
+        self.assertIn('access', response.data.keys())
+        self.assertIn('user_id', response.data.keys())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_should_refresh_token(self) -> None:
+        client = test.APIClient()
+        token_response = client.post(
+            '/token',
+            {'username': 'testuser', 'password': 'testpassword'},
+            format='json'
+        )
+        refresh_response = client.post(
+            '/token/refresh',
+            {'refresh': token_response.data.get('refresh')},
+            format='json'
+        )
+        self.assertIn('access', refresh_response.data.keys())
+        self.assertEqual(refresh_response.status_code, status.HTTP_200_OK)
+
+    def test_should_login_user(self) -> None:
+        client = test.APIClient()
+        login_response = client.post(
+            '/login',
+            {'username': 'testuser', 'password': 'testpassword'},
+            format='json'
+        )
+        self.assertIn('access_token', login_response.data.keys())
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+

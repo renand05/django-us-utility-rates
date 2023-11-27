@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 OPENEI_API_KEY = 'dfGKbN8UBOw7IdQrHsC63V9IdFGGfnVbFRHcuUHr'
-OPENEI_UTILITY_RATES_START_DATE = '2022-01-01'
 OPENEI_VERSION = '3'
 
 class UtilityRatesServiceBase(ABC):
@@ -20,7 +19,7 @@ class UtilityRatesServiceBase(ABC):
 class UtilityRatesService(UtilityRatesServiceBase):
     def __init__(self) -> None:
         self.openei_base_url = 'https://api.openei.org/utility_rates'
-        self.http_request = HttpRequestBuilder(base_url=self.openei_base_url).add_param('version', OPENEI_VERSION).add_param('api_key', OPENEI_API_KEY).add_param('start_date',OPENEI_UTILITY_RATES_START_DATE)
+        self.http_request = HttpRequestBuilder(base_url=self.openei_base_url).add_param('version', OPENEI_VERSION).add_param('api_key', OPENEI_API_KEY)
 
     def get_openei_results(self) -> Any:
         self.http_request.params.update(self.user_params)
@@ -48,10 +47,8 @@ class UtilityRatesDirector:
         self.response_processor = response_processor
 
     def openei_request(self) -> Any:
-        api_response = self.builder.execute()
-        #TODO parse response
-        #TODO create an iterator from response
-        return api_response
+        response = self.builder.execute()
+        return response
     
     def process_request(self, openei_response) -> Any:
         processed_result = self.response_processor.process_response(openei_response)

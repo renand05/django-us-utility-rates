@@ -2,9 +2,14 @@ from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from django.views.generic import TemplateView
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from utilities.services import UtilityRatesServiceBase, UtilityRatesService
+
+
+OPENEI_UTILITY_RATES_ORDERBY_PARAM = 'startdate'
+OPENEI_FULL_DETAIL_PARAM = 'full'
+OPENEI_LIMIT_PARAM = 1
 
 class WebsiteDemoUserInput(BaseModel):
     user_address: Optional[str]
@@ -12,7 +17,14 @@ class WebsiteDemoUserInput(BaseModel):
     user_percentage_scale: Optional[str]
 
 class OpenEiParams(BaseModel):
+    detail: str = Field(default=OPENEI_FULL_DETAIL_PARAM)
     address: str
+    limit: str = Field(default=OPENEI_LIMIT_PARAM)
+    format: str = 'json'
+    approved: bool = 'true'
+    is_default: bool = 'true'
+    orderby: str = Field(default=OPENEI_UTILITY_RATES_ORDERBY_PARAM)
+    direction: str = 'desc'
 
 class WebsiteDemoView(TemplateView):
 

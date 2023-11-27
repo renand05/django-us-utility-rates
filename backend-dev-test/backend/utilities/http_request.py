@@ -23,17 +23,21 @@ class HttpRequestBuilderBase(ABC):
 class HttpRequestBuilder(HttpRequestBuilderBase):
     def add_param(self, key, value) -> Self:
         self.params[key] = value
+
         return self
 
-    def execute(self):
+    def execute(self) -> json:
         response = requests.get(self.base_url, params=self.params)
+
         return response.json()
 
 class FakeHttpRequestBuilder(HttpRequestBuilderBase):
     def add_param(self, key, value):
         self.params[key] = value
+
         return self
 
-    def execute(self):
+    def execute(self) -> json:
         fake_response = OPENEI_RESPONSE_MOCK
+
         return fake_response

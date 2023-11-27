@@ -33,7 +33,7 @@ class WebsiteDemoTest(TestCase):
         self.assertIn(b'<title>Aether Energy Utilities Demo</title>', response.content)
         self.assertTrue(response.content.strip().endswith(b'</html>'))
     
-    def test_website_can_save_a_POST_request(self) -> None:
+    def test_should_execute_a_POST_request(self) -> None:
         view = WebsiteDemoView()
         request = HttpRequest()
         fake_service = FakeUtilityRatesService()
@@ -45,14 +45,13 @@ class WebsiteDemoTest(TestCase):
             'website_demo.html',
             {'new_user_address': 'Black Star #45',
              'new_user_consumption': '15',
-             'new_user_percentage_scale': '10'
-            },
+             'new_user_percentage_scale': '10'},
             request=request
         )
         self.assertEqual(response.content.decode(), expected_html)
  
 class ModelsTest(TestCase):
-    def test_saving_and_retrieving_users(self) -> None:
+    def test_should_save_and_retrieve_users(self) -> None:
         first_user = User()
         first_user.firstname = 'Luke'
         first_user.lastname = 'Skywalker'
@@ -81,8 +80,21 @@ class ModelsTest(TestCase):
 class ServicesTest(TestCase):
     @patch('utilities.services.UtilityRatesDirector.process_request', return_value='test')
     @patch('utilities.services.UtilityRatesDirector.openei_request', return_value='test')
-    def test_when_calling_openei_should_call_http_and_processor_once(self, request_method_mock: mock.Mock, process_method_mock: mock.Mock) -> None:
+    def test_should_call_http_and_processor_once(self, request_method_mock: mock.Mock, process_method_mock: mock.Mock) -> None:
         service = UtilityRatesService()
         service.get_openei_results()
         request_method_mock.assert_called_once()
         process_method_mock.assert_called_once()
+
+class ProcessorTest(TestCase):
+    def should_compute_average_consumptino_rate() -> None:
+        pass
+
+    def should_retrieve_utility_tariff_details() -> None:
+        pass
+
+    def should_retrieve_utilities() -> None:
+        pass
+
+    def should_compute_year_proyection_cost() -> None:
+        pass

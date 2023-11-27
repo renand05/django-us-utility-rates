@@ -9,14 +9,8 @@ from rest_framework import status
 from utilities.models import User
 from utilities.services import UtilityRatesService, FakeUtilityRatesService
 
-from pydantic import BaseModel
 
-class WebsiteDemoRequest(BaseModel):
-    user_address: str
-    user_consumption: str
-    user_percentage_scale: str
-
-class WebsiteDemoTest(TestCase):
+class RatesApiTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = get_user_model().objects.create_user(username='testuser', password='testpassword')

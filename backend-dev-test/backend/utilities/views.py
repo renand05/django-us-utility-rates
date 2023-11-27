@@ -12,10 +12,10 @@ OPENEI_UTILITY_RATES_ORDERBY_PARAM = 'startdate'
 OPENEI_FULL_DETAIL_PARAM = 'full'
 OPENEI_LIMIT_PARAM = 1
 
-class WebsiteDemoUserInput(BaseModel):
-    user_address: Optional[str]
-    user_consumption: Optional[str]
-    user_percentage_scale: Optional[str]
+class UserInput(BaseModel):
+    address: Optional[str]
+    consumption: Optional[str]
+    percentage_scale: Optional[str]
 
 class OpenEiParams(BaseModel):
     detail: str = Field(default=OPENEI_FULL_DETAIL_PARAM)
@@ -38,8 +38,8 @@ class RatesDemoView(APIView):
         })
 
     def post(self, request: HttpRequest, service: UtilityRatesServiceBase = UtilityRatesService()) -> HttpResponse:
-        user_input = WebsiteDemoUserInput.model_validate_json(request.body.decode())
-        openei_params = OpenEiParams(address=user_input.user_address)
+        user_input = UserInput.model_validate_json(request.body.decode())
+        openei_params = OpenEiParams(address=user_input.address)
         service.user_params = openei_params.model_dump()
         user_results = service.get_openei_results()
         return Response({

@@ -87,7 +87,7 @@ class ServicesTest(TestCase):
         process_method_mock.assert_called_once()
 
 class ProcessorTest(TestCase):
-    def should_compute_average_consumptino_rate() -> None:
+    def should_compute_average_consumption_rate() -> None:
         pass
 
     def should_retrieve_utility_tariff_details() -> None:

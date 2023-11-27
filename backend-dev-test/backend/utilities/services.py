@@ -1,5 +1,6 @@
 from utilities.http_request import HttpRequestBuilder, FakeHttpRequestBuilder, HttpRequestBuilderBase
 from backend.utilities.processors import OpenEiProcessor
+from geopy.geocoders import Nominatim
 
 from abc import ABC, abstractmethod
 from typing import Any
@@ -10,6 +11,7 @@ OPENEI_VERSION = '3'
 class UtilityRatesServiceBase(ABC):
     user_params = {}
     response_processor = OpenEiProcessor()
+    geolocator = Nominatim(user_agent="utility_rates")
 
     @abstractmethod
     def get_openei_results(self) -> Any:
@@ -21,7 +23,15 @@ class UtilityRatesService(UtilityRatesServiceBase):
         self.openei_base_url = 'https://api.openei.org/utility_rates'
         self.http_request = HttpRequestBuilder(base_url=self.openei_base_url).add_param('version', OPENEI_VERSION).add_param('api_key', OPENEI_API_KEY)
 
+    def include_geolocation_from_address_as_params(self, address: str) -> None:
+        location = self.geolocator.geocode(address)
+        if location:
+            self.user_params['lat'] = round(location.latitude, 2)
+            self.user_params['lon'] = round(location.longitude, 2)
+            self.user_params.pop('address')
+
     def get_openei_results(self) -> Any:
+        self.include_geolocation_from_address_as_params(address=self.user_params.get('address'))
         self.http_request.params.update(self.user_params)
         api_director = UtilityRatesDirector(builder=self.http_request, response_processor=self.response_processor)
         openei_response = api_director.openei_request()

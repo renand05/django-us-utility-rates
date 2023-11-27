@@ -17,7 +17,6 @@ class UtilityItem(BaseModel):
     sector: str
     flatdemandunit: str
     energyratestructure: List[List[UtilityPeriodRate]]
-    flatdemandmonths: Optional[List]
     energyweekdayschedule: Optional[List]
     energyweekendschedule: Optional[List]
     fixedmonthlycharge: float
@@ -38,7 +37,6 @@ class OpenEiProcessor(ResponseProcessor):
         return [UtilityItem.model_validate(item) for item in items_list]
 
     def process_response(self, openei_response: Dict) -> List[UtilityItem]:
-        print('>>>>>>>>>>>>>>>>>> response', openei_response)
         utility_rates = self.parse_openei_response(openei_response=openei_response)
         # TODO compute avg cost
         # TODO get the most common utility tariff

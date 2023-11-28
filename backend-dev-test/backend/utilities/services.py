@@ -1,9 +1,10 @@
-from utilities.http_request import HttpRequestBuilder, FakeHttpRequestBuilder, HttpRequestBuilderBase
+from abc import ABC, abstractmethod
 from backend.utilities.processors import OpenEiProcessor
 from geopy.geocoders import Nominatim
+import json
 
-from abc import ABC, abstractmethod
-from typing import Any
+from utilities.interfaces import UserInput, OpenEiProcessorResponse
+from utilities.http_request import HttpRequestBuilder, FakeHttpRequestBuilder, HttpRequestBuilderBase
 
 OPENEI_API_KEY = 'dfGKbN8UBOw7IdQrHsC63V9IdFGGfnVbFRHcuUHr'
 OPENEI_VERSION = '3'
@@ -14,7 +15,7 @@ class UtilityRatesServiceBase(ABC):
     geolocator = Nominatim(user_agent="utility_rates")
 
     @abstractmethod
-    def get_openei_results(self) -> Any:
+    def get_openei_results(self, user_input: UserInput) -> OpenEiProcessorResponse:
         pass
 
 
@@ -30,37 +31,40 @@ class UtilityRatesService(UtilityRatesServiceBase):
             self.user_params['lon'] = round(location.longitude, 2)
             self.user_params.pop('address')
 
-    def get_openei_results(self) -> Any:
+    def get_openei_results(self, user_input: UserInput) -> OpenEiProcessorResponse:
         self.include_geolocation_from_address_as_params(address=self.user_params.get('address'))
         self.http_request.params.update(self.user_params)
         api_director = UtilityRatesDirector(builder=self.http_request, response_processor=self.response_processor)
         openei_response = api_director.openei_request()
-        result = api_director.process_request(openei_response=openei_response)
+        result = api_director.process_request(openei_response=openei_response, user_input=user_input)
 
         return result
 
-class FakeUtilityRatesService(UtilityRatesServiceBase):
-    def __init__(self) -> None:
-        self.fake_openei_base_url = 'https://api.fakeopenei.org/utility_rates'
-        self.fake_http_request = FakeHttpRequestBuilder(self.fake_openei_base_url).add_param('api_key', 'fake_api_key').add_param('start_date','2022-01-01')
-
-    def get_openei_results(self) -> Any:
-        api_director = UtilityRatesDirector(builder=self.fake_http_request, response_processor=self.response_processor)
-        openei_response = api_director.openei_request()
-        result = api_director.process_request(openei_response=openei_response)
-
-        return result
 
 class UtilityRatesDirector:
     def __init__(self, builder: HttpRequestBuilderBase, response_processor: OpenEiProcessor):
         self.builder = builder
         self.response_processor = response_processor
 
-    def openei_request(self) -> Any:
+    def openei_request(self) -> json:
         response = self.builder.execute()
         return response
     
-    def process_request(self, openei_response) -> Any:
-        processed_result = self.response_processor.process_response(openei_response)
+    def process_request(self, openei_response: json, user_input: UserInput) -> OpenEiProcessorResponse:
+        processed_result = self.response_processor.process_response(openei_response=openei_response, user_input=user_input)
 
         return processed_result
+
+
+class FakeUtilityRatesService(UtilityRatesServiceBase):
+    def __init__(self) -> None:
+        self.fake_openei_base_url = 'https://api.fakeopenei.org/utility_rates'
+        self.fake_http_request = FakeHttpRequestBuilder(self.fake_openei_base_url).add_param('api_key', 'fake_api_key').add_param('start_date','2022-01-01')
+
+    def get_openei_results(self, user_input: UserInput) -> OpenEiProcessorResponse:
+        api_director = UtilityRatesDirector(builder=self.fake_http_request, response_processor=self.response_processor)
+        openei_response = api_director.openei_request()
+        result = api_director.process_request(openei_response=openei_response, user_input=user_input)
+
+        return result
+

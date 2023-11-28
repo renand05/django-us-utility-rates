@@ -7,7 +7,8 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from utilities.models import User
-from utilities.services import UtilityRatesService, FakeUtilityRatesService
+from utilities.interfaces import UserInput
+from utilities.services import UtilityRatesService
 
 
 class RatesApiTest(TestCase):
@@ -66,11 +67,26 @@ class ModelsTest(TestCase):
 class ServicesTest(TestCase):
     @patch('utilities.services.UtilityRatesDirector.process_request', return_value='test')
     @patch('utilities.services.UtilityRatesDirector.openei_request', return_value='test')
-    def test_should_call_http_and_processor_once(self, request_method_mock: mock.Mock, process_method_mock: mock.Mock) -> None:
+    @patch('utilities.services.UtilityRatesService.include_geolocation_from_address_as_params', return_value=None)
+    def test_should_call_http_and_processor_once(self, location_mock: mock.Mock, request_method_mock: mock.Mock, process_method_mock: mock.Mock) -> None:
         service = UtilityRatesService()
-        service.get_openei_results()
+        user_input = UserInput(
+            address='test',
+            consumption=100,
+            percentage_scale=5
+        )
+        service.get_openei_results(user_input=user_input)
+        location_mock.assert_called_once()
         request_method_mock.assert_called_once()
         process_method_mock.assert_called_once()
+
+    def test_should_include_geolocation_params(self) -> None:
+        service= UtilityRatesService()
+        service.user_params['address'] = 'address'
+        address = '1600 Amphitheatre Parkway, Mountain View, CA'
+        service.include_geolocation_from_address_as_params(address=address)
+        self.assertIn('lat', service.user_params.keys())
+        self.assertIn('lon', service.user_params.keys())
 
 class ProcessorTest(TestCase):
     def should_compute_average_consumption_rate() -> None:

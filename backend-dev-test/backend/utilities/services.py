@@ -51,7 +51,7 @@ class UtilityRatesDirector:
         return response
     
     def process_request(self, openei_response: json, user_input: UserInput) -> OpenEiProcessorResponse:
-        processed_result = self.response_processor.process_response(openei_response=openei_response, user_input=user_input)
+        processed_result = self.response_processor.process_response(input=openei_response, user_input=user_input)
 
         return processed_result
 
@@ -64,7 +64,7 @@ class FakeUtilityRatesService(UtilityRatesServiceBase):
     def get_openei_results(self, user_input: UserInput) -> OpenEiProcessorResponse:
         api_director = UtilityRatesDirector(builder=self.fake_http_request, response_processor=self.response_processor)
         openei_response = api_director.openei_request()
-        result = api_director.process_request(openei_response=openei_response, user_input=user_input)
+        result = api_director.process_request(input=openei_response, user_input=user_input)
 
         return result
 

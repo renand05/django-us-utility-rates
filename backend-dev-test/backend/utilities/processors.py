@@ -30,7 +30,7 @@ class UtilityItem(BaseModel):
 
 
 class ProcessorResponse:
-    def process_response(self, openei_response: json, user_input: UserInput):
+    def process_response(self, input: json, user_input: UserInput):
         raise NotImplementedError("Subclasses must implement process_response")
 
 
@@ -61,8 +61,8 @@ class OpenEiProcessor(ProcessorResponse):
     def get_average_rate_mode_2(self, energy_rates_structure: List[List[UtilityPeriodRate]], energy_weekdayschedule: List[List[int]]) -> float:
         pass 
 
-    def process_response(self, openei_response: json, user_input: UserInput) -> OpenEiProcessorResponse:
-        utility_rates = self.parse_openei_response(openei_response=openei_response)
+    def process_response(self, input: json, user_input: UserInput) -> OpenEiProcessorResponse:
+        utility_rates = self.parse_openei_response(openei_response=input)
         hourly_average_rates_cost = []
         user_rates_cost = []
 

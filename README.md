@@ -1,1 +1,1 @@
-# aether-energy
+# Get utility rates from US energy renwable energies

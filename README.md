@@ -1,1 +1,1 @@
-# Get utility rates from US energy renwable energies
+# Get utility rates from US energy renewable energies
